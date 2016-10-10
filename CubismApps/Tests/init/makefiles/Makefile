@@ -72,3 +72,6 @@ tests: $(OBJECTS)
 
 clean:
 	rm -f *.o tests
+
+clear:
+	rm -f *.channel?  *.h5 *.xmf
