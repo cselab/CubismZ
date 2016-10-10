@@ -28,7 +28,6 @@ void swapbytes(unsigned char *mem, int nbytes)
         for (int i = 0; i < nbytes; i++) mem[nbytes-i-1] = buf[i];
 }
 
-
 //#define _USE_FLOAT16_	// peh: put it as an option in Makefile.config
 
 #if defined(_USE_ZEROBITS_)
@@ -340,7 +339,7 @@ size_t WaveletCompressorGeneric<DATASIZE1D, DataType>::compress(const float thre
 }
 
 template<int DATASIZE1D, typename DataType>
-void WaveletCompressorGeneric<DATASIZE1D, DataType>::decompress(const bool float16, size_t bytes, int wtype)//, DataType data[DATASIZE1D][DATASIZE1D][DATASIZE1D])
+void WaveletCompressorGeneric<DATASIZE1D, DataType>::decompress(const bool float16, size_t bytes, int wtype)
 {
 	bitset<BS3> mask;
 	const int expected = deserialize_bitset<BS3>(mask, bufcompression, BITSETSIZE);

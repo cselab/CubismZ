@@ -61,7 +61,7 @@ template<int>
 inline __m128 myshuffle(__m128 a, __m128 b);
 
 template<>
-inline __m128 myshuffle<1114>(__m128 a, __m128 b)
+inline __m128 myshuffle<01114>(__m128 a, __m128 b)
 {
 	return _mm_shuffle_ps(a, _mm_shuffle_ps(a, b, _MM_SHUFFLE(0,0,1,1)), _MM_SHUFFLE(3,1,1,1));
 }
