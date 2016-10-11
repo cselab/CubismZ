@@ -1,5 +1,5 @@
 # Compile
-make clean;make CC=mpic++ wavz=0 drain=1 zlib=0 
+make clean;make CC=mpic++ wavz=1 drain=0 zlib=1
 
 # Get HDF5 file from another Test 
 cp ../init/makefiles/out1.h5 .

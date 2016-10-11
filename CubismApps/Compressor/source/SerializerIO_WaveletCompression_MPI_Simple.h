@@ -226,7 +226,7 @@ protected:
 					WaveletCompressor compressor;
 
 					Real * const mysoabuffer = &compressor.uncompressed_data()[0][0][0];
-#if 1
+#if 0
 					for(int iz=0; iz<FluidBlock::sizeZ; iz++)
 						for(int iy=0; iy<FluidBlock::sizeY; iy++)
 							for(int ix=0; ix<FluidBlock::sizeX; ix++)
