@@ -1,3 +1,14 @@
+/*
+ *  WaveletsOnInterval.h
+ *
+ *
+ *  Created by Diego Rossinelli.
+ *  Extended by Panos Hadjidoukas.
+ *  Copyright 2013 ETH Zurich. All rights reserved.
+ *
+ */
+
+
 #ifndef _WAVELETSONINTERVALQPX_H_
 #define _WAVELETSONINTERVALQPX_H_ 1
 

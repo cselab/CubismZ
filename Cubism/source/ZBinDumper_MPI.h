@@ -45,8 +45,9 @@ void DumpZBin_MPI(TGrid &grid, const int iCounter, const Real t, const string f_
 	MPI_Status status;
 	MPI_File file_id;
 
-	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-	MPI_Comm_size(MPI_COMM_WORLD, &nranks);
+    MPI_Comm comm = grid.getCartComm();
+	MPI_Comm_rank(comm, &rank);
+	MPI_Comm_size(comm, &nranks);
 
 	int coords[3];
 	grid.peindex(coords);
@@ -145,7 +146,7 @@ void DumpZBin_MPI(TGrid &grid, const int iCounter, const Real t, const string f_
 #if DBG
 	printf("Writing %ld bytes of Compressed data (cr = %.2f)\n", compressed_bytes, local_bytes*1.0/compressed_bytes);
 #endif
-	MPI_Exscan( &compressed_bytes, &offset, 1, MPI_LONG, MPI_SUM, MPI_COMM_WORLD);
+	MPI_Exscan( &compressed_bytes, &offset, 1, MPI_LONG, MPI_SUM, comm);
 
 	if (rank == 0) offset = 0;
 
@@ -160,7 +161,7 @@ void DumpZBin_MPI(TGrid &grid, const int iCounter, const Real t, const string f_
 	printf("rank %d, offset = %ld, size = %ld\n", rank, tag.offset[ichannel], tag.size[ichannel]); fflush(0);
 #endif
 	previous_offset = (tag.offset[ichannel] + tag.size[ichannel]);
-	MPI_Bcast(&previous_offset, 1, MPI_LONG, nranks-1, MPI_COMM_WORLD);
+	MPI_Bcast(&previous_offset, 1, MPI_LONG, nranks-1, comm);
 
 	long base = MAX_MPI_PROCS*sizeof(tag); 	// full Header
 
@@ -184,8 +185,9 @@ void ReadZBin_MPI(TGrid &grid, const string f_name, const string dump_path=".")
 	MPI_Status status;
 	MPI_File file_id;
 
-	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-	MPI_Comm_size(MPI_COMM_WORLD, &nranks);
+    MPI_Comm comm = grid.getCartComm();
+	MPI_Comm_rank(comm, &rank);
+	MPI_Comm_size(comm, &nranks);
 
 	int coords[3];
 	grid.peindex(coords);

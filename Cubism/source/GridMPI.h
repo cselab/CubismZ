@@ -9,6 +9,7 @@
 #pragma once
 
 #include <vector>
+#include <mpi.h>
 
 using namespace std;
 
@@ -26,14 +27,15 @@ protected:
 	friend class SynchronizerMPI;
 
 	int myrank, mypeindex[3], pesize[3];
-	bool periodic[3];
+	int periodic[3];
 	int mybpd[3], myblockstotalsize, blocksize[3];
 
 	vector<BlockInfo> cached_blockinfo;
 
 	map<StencilInfo, SynchronizerMPI *> SynchronizerMPIs;
 
-	MPI::Cartcomm cartcomm;
+    MPI_Comm worldcomm;
+	MPI_Comm cartcomm;
 
 public:
 
@@ -41,7 +43,7 @@ public:
 
 	GridMPI(const int npeX, const int npeY, const int npeZ,
 			const int nX, const int nY=1, const int nZ=1,
-			const double maxextent = 1): TGrid(nX, nY, nZ, maxextent), timestamp(0)
+			const double maxextent = 1, const MPI_Comm comm = MPI_COMM_WORLD): TGrid(nX, nY, nZ, maxextent), timestamp(0), worldcomm(comm)
 	{
 		blocksize[0] = Block::sizeX;
 		blocksize[1] = Block::sizeY;
@@ -60,12 +62,13 @@ public:
 		pesize[1] = npeY;
 		pesize[2] = npeZ;
 
-		assert(npeX*npeY*npeZ == MPI::COMM_WORLD.Get_size());
+        int world_size;
+        MPI_Comm_size(worldcomm, &world_size);
+		assert(npeX*npeY*npeZ == world_size);
 
-		cartcomm = MPI::COMM_WORLD.Create_cart(3, pesize, periodic, true);
-		myrank = cartcomm.Get_rank();
-
-		cartcomm.Get_coords(myrank, 3, mypeindex);
+        MPI_Cart_create(worldcomm, 3, pesize, periodic, true, &cartcomm);
+        MPI_Comm_rank(cartcomm, &myrank);
+        MPI_Cart_coords(cartcomm, myrank, 3, mypeindex);
 
 		const vector<BlockInfo> vInfo = TGrid::getBlocksInfo();
 
@@ -218,9 +221,14 @@ public:
         return timestamp;
     }
 
-    MPI::Cartcomm getCartComm() const
+    MPI_Comm getCartComm() const
 	{
 		return cartcomm;
+	}
+
+    MPI_Comm getWorldComm() const
+	{
+		return worldcomm;
 	}
 
     double getH() const

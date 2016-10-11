@@ -3,6 +3,7 @@
  *
  *
  *  Created by Diego Rossinelli on 3/27/13.
+ *  Extended by Panos Hadjidoukas. 
  *  Copyright 2013 ETH Zurich. All rights reserved.
  *
  */
@@ -321,12 +322,12 @@ public:
 				printf("Encoder: <%s>\n", buf);
 #if defined(_USE_ZLIB_)
 				MYASSERT(buf == string("zlib"),
-						 "\nATTENZIONE:\nEncoder in the file is " << buf <<
-						 " and i have zlib.\n");
+						"\nATTENZIONE:\nEncoder in the file is " << buf <<
+						" and i have zlib.\n");
 #elif defined(_USE_LZ4_)
 				MYASSERT(buf == string("lz4"),
-						 "\nATTENZIONE:\nEncoder in the file is " << buf <<
-						 " and i have lz4.\n");
+						"\nATTENZIONE:\nEncoder in the file is " << buf <<
+						" and i have lz4.\n");
 #endif
 
 				fgets(buf, sizeof(buf), file);
@@ -654,12 +655,13 @@ public:
 			}
 
 #elif defined(_USE_SHUFFLE_)
-                        reshuffle((char *)compressor.compressed_data(), nbytes, sizeof(Real));
-                        memcpy((void *) MYBLOCK, (void *)compressor.compressed_data(), nbytes);
+			reshuffle((char *)compressor.compressed_data(), nbytes, sizeof(Real));
+			memcpy((void *) MYBLOCK, (void *)compressor.compressed_data(), nbytes);
 
 #else
-                        memcpy((void *) MYBLOCK, (void *)compressor.compressed_data(), nbytes);
+			memcpy((void *) MYBLOCK, (void *)compressor.compressed_data(), nbytes);
 #endif
+
 			const int BS3 = (_BLOCKSIZE_*_BLOCKSIZE_*_BLOCKSIZE_)*sizeof(Real);
 			zratio2 = (1.0*BS3)/nbytes;
 #if defined(VERBOSE)

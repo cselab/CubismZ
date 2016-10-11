@@ -127,7 +127,11 @@ public:
 				int itemCount = 0;
 
 				for (int j=i+1; j<argc; j++)
-					if (argv[j][0] == '-')
+                {
+                    const bool leadingDash = (argv[j][0] == '-');
+                    const char c = argv[j][1];
+                    const bool firstNumeric = ((c >= '0' && c <= '9') || c == 0) ? true : false;
+					if (leadingDash && !firstNumeric)
 						break;
 					else
 					{
@@ -137,6 +141,7 @@ public:
 						values += argv[j];
 						itemCount++;
 					}
+                }
 
 				if (itemCount == 0)
 					values = "true";
@@ -210,13 +215,15 @@ class ArgumentParser: public CommandlineParser
     typedef std::map<std::string, Value*> pArgMap;
     typedef std::map<std::string, ArgMap* > FileMap;
 
+    const char commentStart;
+
     // keep a reference form option origin
     ArgMap  from_commandline;
     FileMap from_files;
     pArgMap from_code;
 
     // helper
-    void _ignoreComments(std::ifstream& stream, const char commentChar = '#')
+    void _ignoreComments(std::istream& stream, const char commentChar)
     {
         stream >> std::ws;
         int nextchar = stream.peek();
@@ -258,7 +265,10 @@ class ArgumentParser: public CommandlineParser
 
 public:
     ArgumentParser(const int _argc, const char ** _argv):
-        CommandlineParser(_argc, _argv) { from_commandline = mapArguments; }
+        CommandlineParser(_argc, _argv), commentStart('#')
+    {
+        from_commandline = mapArguments;
+    }
 
     virtual ~ArgumentParser()
     {
@@ -276,15 +286,29 @@ public:
         {
             // read (key value) pairs from input file, ignore comments
             // beginning with "#"
-            std::string key, val;
+            _ignoreComments(confFile, commentStart);
             while (!confFile.eof())
             {
-                _ignoreComments(confFile);
-                confFile >> key >> val;
+                std::string line, key, val;
+                std::getline(confFile, line);
+                std::istringstream lineStream(line);
+                lineStream >> key;
+                lineStream >> val;
+                _ignoreComments(lineStream, commentStart);
+                while(!lineStream.eof())
+                {
+                    std::string multiVal;
+                    lineStream >> multiVal;
+                    val += (" " + multiVal);
+                    _ignoreComments(lineStream, commentStart);
+                }
                 if (_existKey(key)) continue;
+
                 std::pair<string, Value> item(key, Value(val));
                 mapArguments.insert(item); // add to parent container
                 myFMap.insert(item); // add to private container
+
+                _ignoreComments(confFile, commentStart);
             }
         }
     }

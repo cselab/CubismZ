@@ -1,8 +1,8 @@
 /*
  *  WaveletCompressor.h
  *
- *
  *  Created by Diego Rossinelli on 3/4/13.
+ *  Extended by Panos Hadjidoukas.
  *  Copyright 2013 ETH Zurich. All rights reserved.
  *
  */

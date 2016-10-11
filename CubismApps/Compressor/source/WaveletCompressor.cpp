@@ -3,6 +3,7 @@
  *  
  *
  *  Created by Diego Rossinelli on 3/4/13.
+ *  Extended by Panos Hadjidoukas.
  *  Copyright 2013 ETH Zurich. All rights reserved.
  *
  */
@@ -185,12 +186,12 @@ float _cvtfromf16(const unsigned short f16)
 }
 
 template<int DATASIZE1D, typename DataType>
-size_t WaveletCompressorGeneric<DATASIZE1D, DataType>::compress(const float threshold, const bool float16, int wtype)//, const DataType data[DATASIZE1D][DATASIZE1D][DATASIZE1D])
+size_t WaveletCompressorGeneric<DATASIZE1D, DataType>::compress(const float threshold, const bool float16, int wtype)
 {				
 	full.fwt(wtype);
-	
+
 	assert(BITSETSIZE % sizeof(DataType) == 0);
-	
+
 	bitset<BS3> mask;
 	const int survivors = full.template threshold<DataType, DATASIZE1D>(threshold, mask, (DataType *)(bufcompression + BITSETSIZE));
 
@@ -206,7 +207,7 @@ size_t WaveletCompressorGeneric<DATASIZE1D, DataType>::compress(const float thre
 #endif
 
 	serialize_bitset<BS3>(mask, bufcompression, BITSETSIZE);
-	
+
 #if defined(_USE_SHUFFLE3_)||defined(_USE_ZEROBITS_)
 
  #if !defined(_USE_FLOAT16_)	// ZEROBITS and/or SHUFFLE
@@ -249,14 +250,13 @@ size_t WaveletCompressorGeneric<DATASIZE1D, DataType>::compress(const float thre
 	return BITSETSIZE + sizeof(unsigned short) * survivors;
 }
 
-
 template<int DATASIZE1D, typename DataType>
-size_t WaveletCompressorGeneric<DATASIZE1D, DataType>::compress(const float threshold, const bool float16, bool swap, int wtype)//, const DataType data[DATASIZE1D][DATASIZE1D][DATASIZE1D])
+size_t WaveletCompressorGeneric<DATASIZE1D, DataType>::compress(const float threshold, const bool float16, bool swap, int wtype)
 {				
 	full.fwt(wtype);
-	
+
 	assert(BITSETSIZE % sizeof(DataType) == 0);
-	
+
 	bitset<BS3> mask;
 	const int survivors = full.template threshold<DataType, DATASIZE1D>(threshold, mask, (DataType *)(bufcompression + BITSETSIZE));
 
@@ -329,12 +329,12 @@ size_t WaveletCompressorGeneric<DATASIZE1D, DataType>::compress(const float thre
 #endif
 
 	if (!float16) return BITSETSIZE + sizeof(DataType) * survivors;
-	
+
 	for(int i = 0; i < survivors; ++i) 
 		//dangerous, but it looks like i know where i am going with this
 		*(i + (unsigned short *)(bufcompression + BITSETSIZE)) = 
 		_cvt2f16(*(i + (DataType *)(bufcompression + BITSETSIZE)));
-	
+
 	return BITSETSIZE + sizeof(unsigned short) * survivors;
 }
 
@@ -355,16 +355,16 @@ void WaveletCompressorGeneric<DATASIZE1D, DataType>::decompress(const bool float
 	reshuffle3((char *)(bufcompression + BITSETSIZE), bytes - BITSETSIZE, sizeof(unsigned short));
 
 	size_t bytes_read = BITSETSIZE;
-	
+
 	//const
 	int nelements = (bytes - bytes_read) / sizeof(unsigned short);
 	if (nelements - expected == 1) {
 		nelements--;
 	}
 	assert(expected == nelements);
-	
+
 	vector<DataType> datastream(nelements);
-	
+
 	{
 		/* this is buggy if datastream is not 2-bytes aligned, not? */
 		unsigned short elements[nelements];
@@ -372,7 +372,7 @@ void WaveletCompressorGeneric<DATASIZE1D, DataType>::decompress(const bool float
 		for(int i = 0; i < nelements; ++i)
 			datastream[i] =  _cvtfromf16(elements[i]);
 	}
-	
+
 	full.load(datastream, mask);
 	full.iwt(wtype);
 	return;
@@ -383,21 +383,21 @@ void WaveletCompressorGeneric<DATASIZE1D, DataType>::decompress(const bool float
 
 	assert((bytes - sizeof(bitset<BS3>)) % sizeof(DataType) == 0 || float16);
 	assert((bytes - sizeof(bitset<BS3>)) % sizeof(unsigned short) == 0);
-	
+
 //	bitset<BS3> mask;
 //	const int expected = deserialize_bitset<BS3>(mask, bufcompression, BITSETSIZE);
 	
 	size_t bytes_read = BITSETSIZE;
-	
+
 	//const
 	int nelements = (bytes - bytes_read) / (float16 ? sizeof(unsigned short) : sizeof(DataType));
 	if (nelements - expected == 1) {
 		nelements--;
 	}
 	assert(expected == nelements);
-	
+
 	vector<DataType> datastream(nelements);
-	
+
 	if (!float16)
 		memcpy((void *)&datastream.front(), bufcompression + bytes_read, sizeof(DataType) * nelements);	
 	else
@@ -408,7 +408,7 @@ void WaveletCompressorGeneric<DATASIZE1D, DataType>::decompress(const bool float
 		for(int i = 0; i < nelements; ++i)
 			datastream[i] =  _cvtfromf16(elements[i]);
 	}
-	
+
 	full.load(datastream, mask);
 	full.iwt(wtype);
 }

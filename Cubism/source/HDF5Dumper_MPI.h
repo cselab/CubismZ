@@ -37,7 +37,8 @@ void DumpHDF5_MPI(TGrid &grid, const int iCounter, const Real absTime, const str
 	herr_t status;
 	hid_t file_id, dataset_id, fspace_id, fapl_id, mspace_id;
 
-	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+    MPI_Comm comm = grid.getCartComm();
+	MPI_Comm_rank(comm, &rank);
 
 	int coords[3];
 	grid.peindex(coords);
@@ -83,7 +84,7 @@ void DumpHDF5_MPI(TGrid &grid, const int iCounter, const Real absTime, const str
 
 	H5open();
 	fapl_id = H5Pcreate(H5P_FILE_ACCESS);
-	status = H5Pset_fapl_mpio(fapl_id, MPI_COMM_WORLD, MPI_INFO_NULL);
+	status = H5Pset_fapl_mpio(fapl_id, comm, MPI_INFO_NULL);
 	file_id = H5Fcreate(filename, H5F_ACC_TRUNC, H5P_DEFAULT, fapl_id);
 	status = H5Pclose(fapl_id);
 
@@ -198,7 +199,8 @@ void ReadHDF5_MPI(TGrid &grid, const string f_name, const string dump_path=".")
 	herr_t status;
 	hid_t file_id, dataset_id, fspace_id, fapl_id, mspace_id;
 
-	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+    MPI_Comm comm = grid.getCartComm();
+	MPI_Comm_rank(comm, &rank);
 
 	int coords[3];
 	grid.peindex(coords);
@@ -239,7 +241,7 @@ void ReadHDF5_MPI(TGrid &grid, const string f_name, const string dump_path=".")
 
 	H5open();
 	fapl_id = H5Pcreate(H5P_FILE_ACCESS);
-	status = H5Pset_fapl_mpio(fapl_id, MPI_COMM_WORLD, MPI_INFO_NULL);
+	status = H5Pset_fapl_mpio(fapl_id, comm, MPI_INFO_NULL);
 	file_id = H5Fopen(filename, H5F_ACC_RDONLY, fapl_id);
 	status = H5Pclose(fapl_id);
 

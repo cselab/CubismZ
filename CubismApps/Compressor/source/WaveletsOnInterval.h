@@ -3,6 +3,7 @@
  *  
  *
  *  Created by Diego Rossinelli and Babak Hejazialhosseini on 3/1/13.
+ *  Extended by Panos Hadjidoukas.
  *  Copyright 2013 ETH Zurich. All rights reserved.
  *
  */
