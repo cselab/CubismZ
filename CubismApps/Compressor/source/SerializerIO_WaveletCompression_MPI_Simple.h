@@ -295,23 +295,6 @@ protected:
 					memcpy(mybuf.compressedbuffer + mybytes, &nbytes, sizeof(nbytes));
 					mybytes += sizeof(nbytes);
 					memcpy(mybuf.compressedbuffer + mybytes, compressor.compressed_data(), sizeof(unsigned char) * nbytes);
-#elif defined(_USE_DRAIN_)
-#if defined(_USE_MORTON_)
-					Real tmp[_BLOCKSIZE_*_BLOCKSIZE_*_BLOCKSIZE_];					
-					for(int iz=0; iz<FluidBlock::sizeZ; iz++)
-						for(int iy=0; iy<FluidBlock::sizeY; iy++)
-							for(int ix=0; ix<FluidBlock::sizeX; ix++)
-								tmp[Morton_3D_Encode_5bit(iz,iy,ix)] =  mysoabuffer[ix + _BLOCKSIZE_ * (iy + _BLOCKSIZE_ * iz)];
-					memcpy(mysoabuffer, tmp, _BLOCKSIZE_*_BLOCKSIZE_*_BLOCKSIZE_*sizeof(Real));
-#endif
-
-					int layout[4] = {_BLOCKSIZE_, _BLOCKSIZE_, _BLOCKSIZE_, 1};
-					nbytes = drain_3df_buffer((float * const)mysoabuffer, layout[0], layout[1], layout[2], (unsigned char *)compressor.compressed_data());
-					printf("draind_3db_buffer: from %d to %d bytes\n", inbytes, nbytes);
-
-					memcpy(mybuf.compressedbuffer + mybytes, &nbytes, sizeof(nbytes));
-					mybytes += sizeof(nbytes);
-					memcpy(mybuf.compressedbuffer + mybytes, compressor.compressed_data(), sizeof(unsigned char) * nbytes);
 #else /* NO COMPRESSION */
 					nbytes = inbytes;
 					memcpy(mybuf.compressedbuffer + mybytes, &nbytes, sizeof(nbytes));
@@ -557,8 +540,6 @@ protected:
 				ss << "Wavelets: " << "fpc" << "\n";
 #elif defined(_USE_FPZIP_)
 				ss << "Wavelets: " << "fpzip" << "\n";
-#elif defined(_USE_DRAIN_)
-				ss << "Wavelets: " << "drain" << "\n";
 #elif defined(_USE_SHUFFLE_)
 				ss << "Wavelets: " << "shuffle" << "\n";
 #else

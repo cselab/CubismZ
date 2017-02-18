@@ -300,10 +300,6 @@ public:
 				MYASSERT(buf == string("fpzip"),
 						"\nATTENZIONE:\nWavelets in the file is " << buf <<
 						" and i have " << "fpzip"  << "\n");
-#elif defined(_USE_DRAIN_)
-				MYASSERT(buf == string("drain"),
-						"\nATTENZIONE:\nWavelets in the file is " << buf <<
-						" and i have " << "drain"  << "\n");
 #elif defined(_USE_SHUFFLE_)
 				MYASSERT(buf == string("shuffle"),
 						"\nATTENZIONE:\nWavelets in the file is " << buf <<
@@ -641,16 +637,6 @@ public:
 			if ((fpz_decompressedbytes < 0)||(fpz_decompressedbytes != ((_BLOCKSIZE_)*(_BLOCKSIZE_)*(_BLOCKSIZE_)*sizeof(Real))))
 			{
 				printf("FPZ DECOMPRESSION FAILURE:  %d!!\n", fpz_decompressedbytes);
-				abort();
-			}
-
-#elif defined(_USE_DRAIN_)
-			int layout[4] = {_BLOCKSIZE_, _BLOCKSIZE_, _BLOCKSIZE_, 1};
-			int drain_decompressedbytes;
-			drain_decompressedbytes = pour_3df_buffer((unsigned char *) compressor.compressed_data(), layout[0], layout[1], layout[2], (float *) MYBLOCK);
-			if ((drain_decompressedbytes < 0)||(drain_decompressedbytes != ((_BLOCKSIZE_)*(_BLOCKSIZE_)*(_BLOCKSIZE_)*sizeof(Real))))
-			{
-				printf("DRAIN DECOMPRESSION FAILURE:  %d!!\n", drain_decompressedbytes);
 				abort();
 			}
 

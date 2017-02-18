@@ -51,10 +51,6 @@ extern "C"
 }
 #endif
 
-#if defined(_USE_DRAIN_)
-#include "drain.h"
-#endif
-
 inline int deflate_inplace(z_stream *strm, unsigned char *buf, unsigned len, unsigned *max);
 inline size_t zdecompress(unsigned char * inputbuf, size_t ninputbytes, unsigned char * outputbuf, const size_t maxsize);
 
